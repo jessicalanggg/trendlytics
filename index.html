@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Social Media Analytics Hub</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animated background particles */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(255, 0, 80, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+      z-index: -1;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(1deg); }
+      66% { transform: translateY(10px) rotate(-1deg); }
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff0050, #ff4081, #ff6500, #ffa500);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 30px rgba(255, 0, 80, 0.3);
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { filter: brightness(1) drop-shadow(0 0 10px rgba(255, 0, 80, 0.3)); }
+      to { filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 0, 80, 0.5)); }
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      font-weight: 300;
+      letter-spacing: 2px;
+    }
+
+    .platform-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 1rem 2rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(255, 0, 80, 0.3), rgba(255, 101, 0, 0.3));
+      border-color: #ff0050;
+      box-shadow: 0 0 20px rgba(255, 0, 80, 0.3);
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .main-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+
+    .platform-section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      display: none;
+    }
+
+    .platform-section.active {
+      display: block;
+    }
+
+    .platform-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .tiktok-title {
+      color: #ff0050;
+    }
+
+    .youtube-title {
+      color: #ff6500;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .input-container {
+      position: relative;
+    }
+
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    input[type="text"]:focus, input[type="file"]:focus {
+      outline: none;
+      border-color: #ff0050;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 20px rgba(255, 0, 80, 0.3);
+      transform: translateY(-2px);
+    }
+
+    input[type="text"]::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    input[type="file"]::file-selector-button {
+      background: linear-gradient(135deg, #ff0050, #ff4081);
+      border: none;
+      padding: 0.5rem 1rem;
+      color: white;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 1rem;
+    }
+
+    .analyze-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #ff0050, #ff4081);
+      border: none;
+      padding: 1rem 2rem;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .youtube-btn {
+      background: linear-gradient(135deg, #ff6500, #ffa500) !important;
+    }
+
+    .analyze-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .analyze-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 0, 80, 0.4);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin: 1rem 0;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff0050, #ff6500);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      position: relative;
+    }
+
+    .progress-bar-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, .2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, .2) 50%,
+        rgba(255, 255, 255, .2) 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 20px 20px;
+      animation: move 1s linear infinite;
+    }
+
+    @keyframes move {
+      0% { background-position: 0 0; }
+      100% { background-position: 20px 20px; }
+    }
+
+    .response-box {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      min-height: 50px;
+      border-left: 4px solid #ff0050;
+      font-family: 'Consolas', monospace;
+      font-size: 0.9rem;
+    }
+
+    .response-box.success {
+      border-left-color: #00ff88;
+    }
+
+    .response-box.error {
+      border-left-color: #ff4444;
+    }
+
+    .stats-container, .recs-container, .content-container {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: none;
+    }
+
+    .stats-container h3, .recs-container h3, .content-container h3 {
+      margin-bottom: 1rem;
+      color: #00ffff;
+      font-size: 1.2rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #00ffff;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .recommendations-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .recommendations-list li {
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .recommendations-list li:before {
+      content: "💡";
+      margin-right: 0.8rem;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .recommendations-list li:last-child {
+      border-bottom: none;
+    }
+
+    .content-ideas {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .content-idea {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1.2rem;
+      border-radius: 12px;
+      border-left: 4px solid #ff0050;
+      transition: transform 0.2s ease;
+    }
+
+    .content-idea:hover {
+      transform: translateY(-2px);
+    }
+
+    .content-idea h4 {
+      color: #00ffff;
+      margin-bottom: 0.6rem;
+      font-size: 1rem;
+    }
+
+    .content-idea p {
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+      font-size: 0.9rem;
+    }
+
+    .content-idea strong {
+      color: #ff4081;
+    }
+
+    .hashtags {
+      margin-top: 0.8rem;
+    }
+
+    .hashtag {
+      display: inline-block;
+      background: rgba(255, 0, 80, 0.2);
+      color: #ff0050;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin: 0.2rem 0.3rem 0.2rem 0;
+      font-weight: 500;
+    }
+
+    /* YouTube specific styles */
+    .youtube-content-idea {
+      border-left-color: #ff6500;
+    }
+
+    .youtube-hashtag {
+      background: rgba(255, 101, 0, 0.2);
+      color: #ff6500;
+    }
+
+    .info-section {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .info-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, #00ffff, #ff0050);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .score-display {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 1rem 0;
+      color: #00ffff;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    .game-container {
+      position: relative;
+      display: inline-block;
+      margin: 1rem 0;
+    }
+
+    #snake-canvas {
+      background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+      border: 3px solid;
+      border-image: linear-gradient(45deg, #ff0050, #00ffff) 1;
+      border-radius: 12px;
+      box-shadow: 
+        0 0 15px rgba(255, 0, 80, 0.3),
+        inset 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .game-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      max-width: 140px;
+      margin: 1rem auto;
+    }
+
+    .control-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: white;
+      font-size: 1rem;
+      padding: 0.6rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+      user-select: none;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 0, 80, 0.3);
+      transform: scale(1.05);
+    }
+
+    .restart-btn {
+      background: linear-gradient(135deg, #333, #555);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      color: white;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.8rem;
+    }
+
+    .restart-btn:hover {
+      background: linear-gradient(135deg, #555, #777);
+      transform: translateY(-1px);
+    }
+
+    .game-over {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: #ff0050;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      border: 2px solid #ff0050;
+      display: none;
+    }
+
+    .info-content {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      line-height: 1.6;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+    }
+
+    .feature-list li {
+      padding: 0.5rem 0;
+      font-size: 0.85rem;
+    }
+
+    .feature-list li:before {
+      content: "✨ ";
+      margin-right: 0.5rem;
+    }
+
+    .download-section {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 8px;
+      display: none;
+    }
+
+    .download-btn {
+      background: linear-gradient(135deg, #00ff88, #00cc6a);
+      color: #000;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .platform-tabs {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .tab-btn {
+        width: 200px;
+        justify-content: center;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      }
+      
+      .stat-value {
+        font-size: 1.1rem;
+      }
+      
+      .content-idea {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Social Media Analytics Hub</h1>
+      <p class="subtitle">Multi-Platform Analysis & Growth Insights</p>
+    </div>
+
+    <div class="platform-tabs">
+      <button class="tab-btn active" data-platform="tiktok">
+        📱 TikTok Analytics
+      </button>
+      <button class="tab-btn" data-platform="youtube">
+        📺 YouTube Analytics
+      </button>
+    </div>
+
+    <div class="main-content">
+      <!-- TikTok Section -->
+      <div id="tiktok-section" class="platform-section active">
+        <h2 class="platform-title tiktok-title">📱 TikTok Profile Analysis</h2>
+        
+        <form id="tiktok-form">
+          <div class="form-group">
+            <label for="tiktok-username">TikTok Username</label>
+            <div class="input-container">
+              <input type="text" name="username" id="tiktok-username" placeholder="Enter username (without @)" required />
+            </div>
+          </div>
+          
+          <button type="submit" class="analyze-btn" id="tiktok-btn">
+            <span>🎯 Analyze TikTok Profile</span>
+          </button>
+        </form>
+
+        <div id="tiktok-progress-bar" class="progress-bar">
+          <div id="tiktok-progress-fill" class="progress-bar-fill"></div>
+        </div>
+        
+        <div id="tiktok-response" class="response-box">Ready to analyze your TikTok profile...</div>
+
+        <div id="tiktok-stats" class="stats-container">
+          <h3>📊 Profile Statistics</h3>
+          <div class="stats-grid" id="tiktok-stats-content"></div>
+        </div>
+
+        <div id="tiktok-recommendations" class="recs-container">
+          <h3>🚀 Growth Recommendations</h3>
+          <ul class="recommendations-list" id="tiktok-recs-content"></ul>
+        </div>
+
+        <div id="tiktok-content-plan" class="content-container">
+          <h3>💡 Content Ideas</h3>
+          <div class="content-ideas" id="tiktok-content-ideas"></div>
+        </div>
+      </div>
+
+      <!-- YouTube Analytics Section -->
+      <div id="youtube-section" class="platform-section">
+        <h2 class="platform-title youtube-title">📺 YouTube Channel Analysis</h2>
+        
+        <form id="youtube-form">
+          <div class="form-group">
+            <label for="youtube-channel">YouTube Channel ID</label>
+            <div class="input-container">
+              <input type="text" name="channel_id" id="youtube-channel" placeholder="Enter channel ID (e.g., veritasium)" required />
+            </div>
+            <small style="opacity: 0.7; font-size: 0.8rem; margin-top: 0.5rem; display: block;">
+              Enter the channel ID from the YouTube URL: youtube.com/@<strong>channel_id</strong>
+            </small>
+          </div>
+          
+          <button type="submit" class="analyze-btn youtube-btn" id="youtube-btn">
+            <span>📊 Analyze YouTube Channel</span>
+          </button>
+        </form>
+
+        <div id="youtube-progress-bar" class="progress-bar">
+          <div id="youtube-progress-fill" class="progress-bar-fill"></div>
+        </div>
+        
+        <div id="youtube-response" class="response-box">Ready to analyze your YouTube channel...</div>
+
+        <div id="youtube-stats" class="stats-container">
+          <h3>📊 Channel Statistics</h3>
+          <div class="stats-grid" id="youtube-stats-content"></div>
+        </div>
+
+        <div id="youtube-signature" class="stats-container">
+          <h3>🎭 Channel Signature</h3>
+          <div id="youtube-signature-content"></div>
+        </div>
+
+        <div id="youtube-ideas" class="recs-container">
+          <h3>🎬 Video Ideas</h3>
+          <div class="content-ideas" id="youtube-ideas-content"></div>
+        </div>
+
+        <div id="youtube-growth" class="content-container">
+          <h3>🚀 Growth Tips</h3>
+          <ul class="recommendations-list" id="youtube-growth-content"></ul>
+        </div>
+      </div>
+
+      <!-- Info/Game Section -->
+      <div class="info-section">
+        <h2 class="info-title">Snake Game</h2>
+        <div class="score-display">Score: <span id="score">0</span></div>
+        <div class="game-container">
+          <canvas id="snake-canvas" width="280" height="280"></canvas>
+          <div id="game-over" class="game-over">Game Over!</div>
+        </div>
+        
+        <div class="game-controls">
+          <div></div>
+          <button class="control-btn" data-direction="up">↑</button>
+          <div></div>
+          <button class="control-btn" data-direction="left">←</button>
+          <button class="restart-btn" onclick="restartGame()">Restart</button>
+          <button class="control-btn" data-direction="right">→</button>
+          <div></div>
+          <button class="control-btn" data-direction="down">↓</button>
+          <div></div>
+        </div>
+        
+        <div class="info-content" style="margin-top: 2rem;">
+          <p style="font-size: 0.85rem; opacity: 0.7;">
+            Play while waiting for your analysis!
+          </p>
+          
+          <details style="margin-top: 1rem;">
+            <summary style="cursor: pointer; font-size: 0.8rem; opacity: 0.8;">Platform Features</summary>
+            <ul class="feature-list" style="margin-top: 0.5rem; font-size: 0.75rem;">
+              <li>TikTok: Profile stats & engagement analysis</li>
+              <li>YouTube: Complete channel analysis from channel ID</li>
+              <li>AI-powered growth recommendations</li>
+              <li>Content idea generation</li>
+              <li>Trending keyword insights</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Platform tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const platform = btn.dataset.platform;
+        
+        // Update tab buttons
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Update platform sections
+        document.querySelectorAll('.platform-section').forEach(section => {
+          section.classList.remove('active');
+        });
+        document.getElementById(`${platform}-section`).classList.add('active');
+      });
+    });
+
+    // TikTok Analytics Form Handler
+    document.getElementById('tiktok-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('tiktok-username').value.trim();
+      const analyzeBtn = document.getElementById('tiktok-btn');
+      const progressBar = document.getElementById('tiktok-progress-bar');
+      const progressBarFill = document.getElementById('tiktok-progress-fill');
+      const responseBox = document.getElementById('tiktok-response');
+      const statsContainer = document.getElementById('tiktok-stats');
+      const recsContainer = document.getElementById('tiktok-recommendations');
+      const contentContainer = document.getElementById('tiktok-content-plan');
+      
+      if (!username) return;
+      
+      // Reset UI
+      analyzeBtn.disabled = true;
+      analyzeBtn.innerHTML = '<span>🔄 Analyzing...</span>';
+      progressBar.style.display = 'block';
+      progressBarFill.style.width = '0%';
+      responseBox.textContent = 'Starting TikTok profile analysis...';
+      responseBox.className = 'response-box';
+      
+      // Hide previous results
+      statsContainer.style.display = 'none';
+      recsContainer.style.display = 'none';
+      contentContainer.style.display = 'none';
+      
+      try {
+        // Simulate realistic progress
+        let progress = 0;
+        const progressMessages = [
+          'Connecting to TikTok...',
+          'Loading profile data...',
+          'Extracting video information...',
+          'Analyzing content patterns...',
+          'Generating recommendations...',
+          'Creating content ideas...',
+          'Finalizing analysis...'
+        ];
+        
+        let messageIndex = 0;
+        const progressInterval = setInterval(() => {
+          progress += Math.random() * 8 + 2;
+          if (progress > 85) progress = 85;
+          progressBarFill.style.width = progress + '%';
+          
+          if (messageIndex < progressMessages.length - 1 && progress > (messageIndex + 1) * 12) {
+            messageIndex++;
+            responseBox.textContent = progressMessages[messageIndex];
+          }
+        }, 800);
+        
+        // Make API call to Flask backend
+        const response = await fetch('/api/tiktok/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username: username })
+        });
+        
+        const data = await response.json();
+        
+        // Complete progress
+        clearInterval(progressInterval);
+        progressBarFill.style.width = '100%';
+        
+        setTimeout(() => {
+          if (data.status === 'success' || !data.error) {
+            responseBox.innerHTML = `<strong>✅ Success!</strong> ${data.message || 'TikTok analysis completed!'}`;
+            responseBox.className = 'response-box success';
+            
+            displayTikTokStats(data.stats || {}, data.metrics || {});
+            displayTikTokRecommendations(data.recommendations || []);
+            displayTikTokContentPlan(data.content_plan || []);
+            
+          } else {
+            responseBox.innerHTML = `<strong>❌ Error:</strong> ${data.message || data.error}`;
+            responseBox.className = 'response-box error';
+          }
+          
+          progressBar.style.display = 'none';
+          analyzeBtn.disabled = false;
+          analyzeBtn.innerHTML = '<span>🎯 Analyze TikTok Profile</span>';
+        }, 500);
+        
+      } catch (error) {
+        clearInterval(progressInterval);
+        console.error('Network error:', error);
+        responseBox.innerHTML = `<strong>❌ Connection Error:</strong> ${error.message}`;
+        responseBox.className = 'response-box error';
+        progressBar.style.display = 'none';
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = '<span>🎯 Analyze TikTok Profile</span>';
+      }
+    });
+
+    // YouTube Analytics Form Handler
+    document.getElementById('youtube-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const channelId = document.getElementById('youtube-channel').value.trim().replace('@', '');
+      const analyzeBtn = document.getElementById('youtube-btn');
+      const progressBar = document.getElementById('youtube-progress-bar');
+      const progressBarFill = document.getElementById('youtube-progress-fill');
+      const responseBox = document.getElementById('youtube-response');
+      const statsContainer = document.getElementById('youtube-stats');
+      const signatureContainer = document.getElementById('youtube-signature');
+      const ideasContainer = document.getElementById('youtube-ideas');
+      const growthContainer = document.getElementById('youtube-growth');
+      
+      if (!channelId) return;
+      
+      // Reset UI
+      analyzeBtn.disabled = true;
+      analyzeBtn.innerHTML = '<span>🔄 Analyzing...</span>';
+      progressBar.style.display = 'block';
+      progressBarFill.style.width = '0%';
+      responseBox.textContent = 'Starting YouTube channel analysis...';
+      responseBox.className = 'response-box';
+      
+      // Hide previous results
+      statsContainer.style.display = 'none';
+      signatureContainer.style.display = 'none';
+      ideasContainer.style.display = 'none';
+      growthContainer.style.display = 'none';
+      
+      try {
+        // Simulate realistic progress for the full workflow
+        let progress = 0;
+        const progressMessages = [
+          'Opening YouTube channel...',
+          'Loading video list...',
+          'Extracting video metadata...',
+          'Processing video information...',
+          'Creating CSV file...',
+          'Analyzing channel signature...',
+          'Generating video ideas...',
+          'Creating growth recommendations...',
+          'Finalizing analysis...'
+        ];
+        
+        let messageIndex = 0;
+        const progressInterval = setInterval(() => {
+          progress += Math.random() * 6 + 2;
+          if (progress > 85) progress = 85;
+          progressBarFill.style.width = progress + '%';
+          
+          if (messageIndex < progressMessages.length - 1 && progress > (messageIndex + 1) * 10) {
+            messageIndex++;
+            responseBox.textContent = progressMessages[messageIndex];
+          }
+        }, 1200);
+        
+        // Make API call to the FULL workflow endpoint
+        const response = await fetch('/api/youtube/full', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ channel_id: channelId })
+        });
+        
+        const data = await response.json();
+        
+        // Complete progress
+        clearInterval(progressInterval);
+        progressBarFill.style.width = '100%';
+        
+        setTimeout(() => {
+          if (data.status === 'success' || (!data.error && data.signature)) {
+            responseBox.innerHTML = `<strong>✅ Success!</strong> ${data.message || 'YouTube channel analyzed successfully!'}`;
+            responseBox.className = 'response-box success';
+            
+            // Display all results
+            if (data.channel_info) {
+              displayYouTubeStats(data.channel_info);
+            }
+            if (data.signature) {
+              displayYouTubeSignature(data.signature);
+            }
+            if (data.video_ideas) {
+              displayYouTubeIdeas(data.video_ideas);
+            }
+            if (data.growth_tips) {
+              displayYouTubeGrowth(data.growth_tips);
+            }
+            
+          } else {
+            responseBox.innerHTML = `<strong>❌ Error:</strong> ${data.message || data.error}`;
+            responseBox.className = 'response-box error';
+          }
+          
+          progressBar.style.display = 'none';
+          analyzeBtn.disabled = false;
+          analyzeBtn.innerHTML = '<span>📊 Analyze YouTube Channel</span>';
+        }, 500);
+        
+      } catch (error) {
+        clearInterval(progressInterval);
+        console.error('Network error:', error);
+        responseBox.innerHTML = `<strong>❌ Connection Error:</strong> ${error.message}`;
+        responseBox.className = 'response-box error';
+        progressBar.style.display = 'none';
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = '<span>📊 Analyze YouTube Channel</span>';
+      }
+    });
+
+    // TikTok Display Functions
+    function displayTikTokStats(stats, metrics) {
+      const statsContent = document.getElementById('tiktok-stats-content');
+      
+      const formatNumber = (num) => {
+        if (typeof num === 'number') {
+          return num.toLocaleString();
+        }
+        return num || 'N/A';
+      };
+      
+      statsContent.innerHTML = `
+        <div class="stat-item">
+          <div class="stat-value">${formatNumber(stats.followers)}</div>
+          <div class="stat-label">Followers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${formatNumber(stats.following)}</div>
+          <div class="stat-label">Following</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${formatNumber(stats.total_likes)}</div>
+          <div class="stat-label">Total Likes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${typeof metrics.avg_engagement === 'number' ? metrics.avg_engagement.toFixed(2) + '%' : metrics.avg_engagement}</div>
+          <div class="stat-label">Avg Engagement</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${formatNumber(metrics.mean_views)}</div>
+          <div class="stat-label">Avg Views</div>
+        </div>
+      `;
+      document.getElementById('tiktok-stats').style.display = 'block';
+    }
+
+    function displayTikTokRecommendations(recommendations) {
+      const recsContent = document.getElementById('tiktok-recs-content');
+      
+      if (recommendations && recommendations.length > 0) {
+        recsContent.innerHTML = recommendations.map(rec => `<li>${rec}</li>`).join('');
+      } else {
+        recsContent.innerHTML = '<li>Keep creating consistent, engaging content!</li>';
+      }
+      
+      document.getElementById('tiktok-recommendations').style.display = 'block';
+    }
+
+    function displayTikTokContentPlan(contentPlan) {
+      const contentIdeas = document.getElementById('tiktok-content-ideas');
+      
+      if (contentPlan && contentPlan.length > 0) {
+        contentIdeas.innerHTML = contentPlan.slice(0, 6).map(idea => `
+          <div class="content-idea">
+            <h4>${idea.hook || 'Content Idea'}</h4>
+            <p><strong>Content:</strong> ${idea.content || 'Create engaging content'}</p>
+            <p><strong>Call to Action:</strong> ${idea.cta || 'Engage with your audience'}</p>
+            <div class="hashtags">
+              ${(idea.hashtags || ['fyp', 'viral']).map(tag => `<span class="hashtag">#${tag}</span>`).join('')}
+            </div>
+          </div>
+        `).join('');
+      } else {
+        contentIdeas.innerHTML = `
+          <div class="content-idea">
+            <h4>Create Engaging Content</h4>
+            <p><strong>Content:</strong> Focus on trending topics in your niche</p>
+            <p><strong>Call to Action:</strong> Ask viewers to comment and share</p>
+            <div class="hashtags">
+              <span class="hashtag">#fyp</span>
+              <span class="hashtag">#viral</span>
+              <span class="hashtag">#trending</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      document.getElementById('tiktok-content-plan').style.display = 'block';
+    }
+
+    // YouTube Stats Display Function  
+    function displayYouTubeStats(channelInfo) {
+      const statsContent = document.getElementById('youtube-stats-content');
+      
+      const formatNumber = (num) => {
+        if (typeof num === 'number') {
+          return num.toLocaleString();
+        }
+        return num || 'N/A';
+      };
+      
+      statsContent.innerHTML = `
+        <div class="stat-item">
+          <div class="stat-value">@${channelInfo.channel_id}</div>
+          <div class="stat-label">Channel ID</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${channelInfo.channel_name}</div>
+          <div class="stat-label">Channel Name</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${formatNumber(channelInfo.video_count)}</div>
+          <div class="stat-label">Videos Analyzed</div>
+        </div>
+      `;
+      document.getElementById('youtube-stats').style.display = 'block';
+    }
+
+    // YouTube Display Functions
+    function displayYouTubeSignature(signature) {
+      const signatureContent = document.getElementById('youtube-signature-content');
+      
+      signatureContent.innerHTML = `
+        <div style="display: grid; gap: 1.5rem; margin-top: 1rem;">
+          <div class="stat-item" style="background: rgba(255, 101, 0, 0.1); border: 1px solid rgba(255, 101, 0, 0.3); padding: 1.5rem; border-radius: 12px;">
+            <div class="stat-label" style="color: #ff6500; font-weight: 600; margin-bottom: 0.8rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">🎭 Channel Vibes</div>
+            <div style="color: #ffffff; font-weight: 600; font-size: 1.1rem; line-height: 1.4;">
+              ${signature.vibes ? signature.vibes.join(' • ') : 'Creative, Engaging, Informative'}
+            </div>
+          </div>
+          <div class="stat-item" style="background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); padding: 1.5rem; border-radius: 12px;">
+            <div class="stat-label" style="color: #ffa500; font-weight: 600; margin-bottom: 0.8rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">📚 Main Topics</div>
+            <div style="color: #ffffff; font-weight: 600; font-size: 1.1rem; line-height: 1.4;">
+              ${signature.topics ? signature.topics.join(' • ') : 'Entertainment, Education, Lifestyle'}
+            </div>
+          </div>
+          <div class="stat-item" style="background: rgba(255, 204, 0, 0.1); border: 1px solid rgba(255, 204, 0, 0.3); padding: 1.5rem; border-radius: 12px;">
+            <div class="stat-label" style="color: #ffcc00; font-weight: 600; margin-bottom: 0.8rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">🔑 Key Keywords</div>
+            <div style="color: #ffffff; font-weight: 600; font-size: 1.1rem; line-height: 1.4;">
+              ${signature.keywords ? signature.keywords.join(' • ') : 'Content, Video, Creator'}
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('youtube-signature').style.display = 'block';
+    }
+
+    function displayYouTubeIdeas(videoIdeas) {
+      const ideasContent = document.getElementById('youtube-ideas-content');
+      
+      if (videoIdeas && videoIdeas.length > 0) {
+        ideasContent.innerHTML = videoIdeas.slice(0, 8).map((idea, index) => `
+          <div class="content-idea youtube-content-idea" style="background: rgba(255, 101, 0, 0.1); border-left: 4px solid #ff6500; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; transition: transform 0.2s ease;">
+            <h4 style="color: #ff6500; margin-bottom: 0.8rem; font-size: 1.1rem; font-weight: 600;">
+              💡 Idea ${index + 1}
+            </h4>
+            <p style="color: #ffffff; font-size: 0.95rem; line-height: 1.4; margin: 0;">
+              ${idea.replace('• ', '')}
+            </p>
+          </div>
+        `).join('');
+      } else {
+        ideasContent.innerHTML = `
+          <div class="content-idea youtube-content-idea" style="background: rgba(255, 101, 0, 0.1); border-left: 4px solid #ff6500; padding: 1.5rem; border-radius: 12px;">
+            <h4 style="color: #ff6500; margin-bottom: 0.8rem; font-size: 1.1rem;">💡 Video Idea</h4>
+            <p style="color: #ffffff; font-size: 0.95rem;">Create content based on your channel's signature topics</p>
+          </div>
+        `;
+      }
+      
+      document.getElementById('youtube-ideas').style.display = 'block';
+    }
+
+    function displayYouTubeGrowth(growthTips) {
+      const growthContent = document.getElementById('youtube-growth-content');
+      
+      if (growthTips && growthTips.length > 0) {
+        growthContent.innerHTML = growthTips.map(tip => `
+          <li style="padding: 1rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: flex-start; line-height: 1.5;">
+            <span style="color: #ff6500; margin-right: 1rem; font-size: 1.2rem; flex-shrink: 0;">🚀</span>
+            <span style="color: #ffffff; font-size: 0.95rem;">${tip.replace('• ', '')}</span>
+          </li>
+        `).join('');
+      } else {
+        growthContent.innerHTML = `
+          <li style="padding: 1rem 0; display: flex; align-items: flex-start;">
+            <span style="color: #ff6500; margin-right: 1rem; font-size: 1.2rem;">🚀</span>
+            <span style="color: #ffffff; font-size: 0.95rem;">Focus on consistent uploads and audience engagement</span>
+          </li>
+        `;
+      }
+      
+      document.getElementById('youtube-growth').style.display = 'block';
+    }
+
+    // Snake Game Implementation
+    const canvas = document.getElementById('snake-canvas');
+    const ctx = canvas.getContext('2d');
+    const scoreElement = document.getElementById('score');
+    const gameOverElement = document.getElementById('game-over');
+
+    let gameRunning = false;
+    let gameLoop = null;
+    let score = 0;
+    
+    const gridSize = 20;
+    const gridWidth = canvas.width / gridSize;
+    const gridHeight = canvas.height / gridSize;
+    
+    let snake = [{ x: 7, y: 7 }];
+    let direction = { x: 0, y: 0 };
+    let nextDirection = { x: 0, y: 0 };
+    let food = generateFood();
+    
+    function generateFood() {
+      let newFood;
+      do {
+        newFood = {
+          x: Math.floor(Math.random() * gridWidth),
+          y: Math.floor(Math.random() * gridHeight)
+        };
+      } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
+      return newFood;
+    }
+    
+    function drawGame() {
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = '#00ffff';
+      ctx.shadowColor = '#00ffff';
+      ctx.shadowBlur = 8;
+      
+      snake.forEach((segment, index) => {
+        if (index === 0) {
+          ctx.fillStyle = '#ff0050';
+          ctx.shadowColor = '#ff0050';
+        } else {
+          ctx.fillStyle = '#00ffff';
+          ctx.shadowColor = '#00ffff';
+        }
+        ctx.fillRect(segment.x * gridSize + 1, segment.y * gridSize + 1, gridSize - 2, gridSize - 2);
+      });
+      
+      ctx.fillStyle = '#ffff00';
+      ctx.shadowColor = '#ffff00';
+      ctx.shadowBlur = 12;
+      ctx.fillRect(food.x * gridSize + 2, food.y * gridSize + 2, gridSize - 4, gridSize - 4);
+      
+      ctx.shadowBlur = 0;
+    }
+    
+    function updateGame() {
+      if (!gameRunning) return;
+      
+      direction = { ...nextDirection };
+      
+      if (direction.x !== 0 || direction.y !== 0) {
+        const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+        
+        if (head.x < 0 || head.x >= gridWidth || head.y < 0 || head.y >= gridHeight) {
+          gameOver();
+          return;
+        }
+        
+        if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+          gameOver();
+          return;
+        }
+        
+        snake.unshift(head);
+        
+        if (head.x === food.x && head.y === food.y) {
+          score += 10;
+          scoreElement.textContent = score;
+          food = generateFood();
+        } else {
+          snake.pop();
+        }
+      }
+      
+      drawGame();
+    }
+    
+    function gameOver() {
+      gameRunning = false;
+      if (gameLoop) {
+        clearInterval(gameLoop);
+        gameLoop = null;
+      }
+      gameOverElement.style.display = 'block';
+    }
+    
+    function startGame() {
+      if (gameRunning) return;
+      
+      gameRunning = true;
+      gameOverElement.style.display = 'none';
+      
+      if (gameLoop) clearInterval(gameLoop);
+      gameLoop = setInterval(updateGame, 150);
+      
+      drawGame();
+    }
+    
+    function restartGame() {
+      snake = [{ x: 7, y: 7 }];
+      direction = { x: 0, y: 0 };
+      nextDirection = { x: 0, y: 0 };
+      score = 0;
+      scoreElement.textContent = score;
+      food = generateFood();
+      
+      if (gameLoop) {
+        clearInterval(gameLoop);
+        gameLoop = null;
+      }
+      
+      gameRunning = false;
+      gameOverElement.style.display = 'none';
+      
+      drawGame();
+      startGame();
+    }
+    
+    function changeDirection(newDirection) {
+      if (!gameRunning) return;
+      
+      if (direction.x !== 0 && newDirection.x === -direction.x) return;
+      if (direction.y !== 0 && newDirection.y === -direction.y) return;
+      
+      nextDirection = newDirection;
+    }
+    
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (!gameRunning) return;
+      
+      switch(e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          changeDirection({ x: 0, y: -1 });
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          changeDirection({ x: 0, y: 1 });
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          changeDirection({ x: -1, y: 0 });
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          changeDirection({ x: 1, y: 0 });
+          break;
+      }
+    });
+    
+    // Button controls
+    document.querySelectorAll('.control-btn[data-direction]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!gameRunning) return;
+        
+        const dir = btn.dataset.direction;
+        switch(dir) {
+          case 'up':
+            changeDirection({ x: 0, y: -1 });
+            break;
+          case 'down':
+            changeDirection({ x: 0, y: 1 });
+            break;
+          case 'left':
+            changeDirection({ x: -1, y: 0 });
+            break;
+          case 'right':
+            changeDirection({ x: 1, y: 0 });
+            break;
+        }
+      });
+    });
+    
+    // Touch controls for mobile
+    let touchStartX = null;
+    let touchStartY = null;
+    
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    });
+    
+    canvas.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (!gameRunning) return;
+      
+      if (touchStartX === null || touchStartY === null) return;
+      
+      const touch = e.changedTouches[0];
+      const deltaX = touch.clientX - touchStartX;
+      const deltaY = touch.clientY - touchStartY;
+      const minSwipeDistance = 30;
+      
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (Math.abs(deltaX) > minSwipeDistance) {
+          changeDirection(deltaX > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 });
+        }
+      } else {
+        if (Math.abs(deltaY) > minSwipeDistance) {
+          changeDirection(deltaY > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
+        }
+      }
+      
+      touchStartX = null;
+      touchStartY = null;
+    });
+    
+    // Initialize game
+    gameRunning = false;
+    drawGame();
+  </script>
+</body>
+</html>
