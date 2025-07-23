@@ -8,3 +8,4 @@ tqdm
 beautifulsoup4
 lxml
 setuptools
+openai
