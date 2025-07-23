@@ -7,3 +7,4 @@ requests
 tqdm
 beautifulsoup4
 lxml
+setuptools
