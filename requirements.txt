@@ -1,0 +1,9 @@
+Flask>=2.0
+gunicorn
+selenium
+undetected-chromedriver
+pandas
+requests
+tqdm
+beautifulsoup4
+lxml
